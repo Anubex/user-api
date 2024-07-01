@@ -8,7 +8,7 @@ import {
   Param,
   ParseIntPipe,
   Query,
-  Put,
+  Patch,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import {
@@ -17,9 +17,15 @@ import {
   ApiCreatedResponse,
   ApiParam,
   ApiBody,
-  ApiQuery,
+  ApiOkResponse,
 } from '@nestjs/swagger';
-import { CreateUser, CreateUserDto } from './dto/user.dto';
+import {
+  CreateUser,
+  CreateUserDto,
+  GetUserDto,
+  GetUserResponse,
+  UpdateUserDto,
+} from './dto/user.dto';
 import { InternalServerErrorResponse } from 'src/common/constants/app.dto';
 import responseHelper from 'src/common/helper/response.helper';
 import userDecorator from './user.decorator';
@@ -40,11 +46,15 @@ export class UserController {
     return responseHelper.parseHttpStatusCode(result);
   }
 
+  @Version('1')
   @Get()
-  @ApiOperation({ summary: 'Find users by name' })
-  @ApiQuery({ name: 'query', required: true })
-  async findUsersByName(@Query('query') query: string): Promise<User[]> {
-    return this.userService.findUsersByName(query);
+  @userDecorator.getUserDecorator()
+  @ApiOkResponse({ type: GetUserResponse })
+  async findUsersByName(
+    @Query() getUserDto: GetUserDto,
+  ): Promise<GetUserResponse | InternalServerErrorResponse> {
+    const result = await this.userService.findUsersByName(getUserDto);
+    return responseHelper.parseHttpStatusCode(result);
   }
 
   @Delete(':id')
@@ -53,18 +63,14 @@ export class UserController {
   deleteUser(@Param('id', ParseIntPipe) id: number) {
     return this.userService.deleteUser(id);
   }
-  @Put(':id')
+  @Patch(':id')
   @ApiOperation({ summary: 'Update' })
   @ApiParam({ name: 'id', type: Number })
-  @ApiBody({ type: CreateUserDto })
+  @ApiBody({ type: UpdateUserDto })
   async updateUser(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateUserDto: CreateUserDto,
+    @Body() updateUserDto: UpdateUserDto,
   ): Promise<User> {
-    return this.userService.updateUser(
-      id,
-      updateUserDto.firstName,
-      updateUserDto.lastName,
-    );
+    return this.userService.updateUser(id, updateUserDto);
   }
 }

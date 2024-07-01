@@ -1,8 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateUser, CreateUserDto } from './dto/user.dto';
+import {
+  CreateUser,
+  CreateUserDto,
+  GetUserDto,
+  GetUserResponse,
+  UserDto,
+} from './dto/user.dto';
 import { Prisma, User } from '@prisma/client';
 import { ExceptionResult } from 'src/common/constants/app.dto';
+import { createPaginator } from 'prisma-pagination';
 
 @Injectable()
 export class UserService {
@@ -91,17 +98,15 @@ export class UserService {
     }
   }
 
-  //   async createUser(createUserDto: CreateUserDto) {
-  //     const { firstName, lastName } = createUserDto;
-  //     return this.prisma.user.create({
-  //       data: {
-  //         firstName,
-  //         lastName,
-  //       },
-  //     });
-  //   }
-  async findUsersByName(filter: string): Promise<User[] | void> {
+  async findUsersByName({
+    filter,
+    page,
+    perPage,
+  }: GetUserDto): Promise<GetUserResponse | ExceptionResult> {
     try {
+      const count = await this.prisma.user.count();
+      const finalPerPage = perPage ? +perPage : +count;
+      const paginate = createPaginator({ page, perPage: finalPerPage });
       const where: Prisma.UserWhereInput = filter
         ? {
             OR: [],
@@ -122,7 +127,7 @@ export class UserService {
           });
           where['OR'] = OR;
         }
-        const result = await paginate<CreateUserDto, Prisma.UserFindManyArgs>(
+        const result = await paginate<UserDto, Prisma.UserFindManyArgs>(
           this.prisma.user,
           {
             where,
@@ -133,25 +138,7 @@ export class UserService {
     } catch (error) {
       console.log('[user.service.getUser]', error.stack);
     }
-
-    // return this.prisma.user.findMany({
-    //   where: {
-    //     OR: [
-    //       {
-    //         firstName: {
-    //           contains: query,
-    //         },
-    //       },
-    //       {
-    //         lastName: {
-    //           contains: query,
-    //         },
-    //       },
-    //     ],
-    //   },
-    // });
   }
-
   async deleteUser(id: number) {
     try {
       return await this.prisma.user.delete({
@@ -161,14 +148,31 @@ export class UserService {
       throw new Error(`Could not delete user with id ${id}: ${error.message}`);
     }
   }
+  // async updateUser(
+  //   id: number,
+  //   firstName: string,
+  //   lastName: string,
+  // ): Promise<User> {
+  //   const user = await this.prisma.user.findUnique({
+  //     where: { id },
+  //   });
+  //   if (!user) {
+  //     throw new NotFoundException(`User with ID ${id} not found`);
+  //   }
+
+  //   return this.prisma.user.update({
+  //     where: { id },
+  //     data: {
+  //       firstName,
+  //       lastName,
+  //     },
+  //   });
+  // }
   async updateUser(
     id: number,
-    firstName: string,
-    lastName: string,
+    data: { firstName?: string; lastName?: string },
   ): Promise<User> {
-    const user = await this.prisma.user.findUnique({
-      where: { id },
-    });
+    const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
@@ -176,8 +180,7 @@ export class UserService {
     return this.prisma.user.update({
       where: { id },
       data: {
-        firstName,
-        lastName,
+        ...data,
       },
     });
   }

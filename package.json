@@ -30,6 +30,7 @@
     "@prisma/client": "^5.15.1",
     "@types/validator": "^13.12.0",
     "class-validator": "^0.14.1",
+    "prisma-pagination": "^0.2.3",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
     "swagger-ui-express": "^5.0.1"
