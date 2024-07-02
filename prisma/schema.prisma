@@ -5,11 +5,20 @@ datasource db {
 
 generator client {
     provider = "prisma-client-js"
-    output   = "../node_modules/.prisma/client"
+    // output   = "../node_modules/.prisma/client"
 }
 
 model User {
-    id        Int    @id @default(autoincrement())
+    id        Int      @id @default(autoincrement())
     firstName String
     lastName  String
+    status    STATUS   @default(enable)
+    createdAt DateTime @default(dbgenerated("NOW()")) @db.DateTime
+    updatedAt DateTime @default(dbgenerated("NOW() ON UPDATE NOW()")) @db.DateTime
+}
+
+enum STATUS {
+    enable
+    disable
+    remove
 }

@@ -73,4 +73,11 @@ export class UserController {
   ): Promise<User> {
     return this.userService.updateUser(id, updateUserDto);
   }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Find a user by ID' })
+  @ApiParam({ name: 'id', type: Number })
+  async findUserById(@Param('id', ParseIntPipe) id: number): Promise<User> {
+    return this.userService.findUserById(id);
+  }
 }
