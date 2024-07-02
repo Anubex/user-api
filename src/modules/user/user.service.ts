@@ -147,13 +147,16 @@ export class UserService {
       console.log('[user.service.getUser]', error.stack);
     }
   }
-  async deleteUser(id: number) {
+  async deleteUser(): Promise<User[]> {
     try {
-      return await this.prisma.user.delete({
-        where: { id },
+      const deletedUsers = await this.prisma.user.deleteMany({
+        where: {
+          status: STATUS.remove,
+        },
       });
+      return deletedUsers as any;
     } catch (error) {
-      throw new Error(`Could not delete user with id ${id}: ${error.message}`);
+      throw new Error(`Could not delete user  : ${error.message}`);
     }
   }
   async updateUser(

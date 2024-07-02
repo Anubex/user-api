@@ -57,11 +57,16 @@ export class UserController {
     return responseHelper.parseHttpStatusCode(result);
   }
 
-  @Delete(':id')
+  // @Delete(':id')
+  // @ApiOperation({ summary: 'Delete user' })
+  // @ApiParam({ name: 'id', type: Number })
+  // deleteUser(@Param('id', ParseIntPipe) id: number) {
+  //   return this.userService.deleteUser(id);
+  // }
+  @Delete('remove')
   @ApiOperation({ summary: 'Delete user' })
-  @ApiParam({ name: 'id', type: Number })
-  deleteUser(@Param('id', ParseIntPipe) id: number) {
-    return this.userService.deleteUser(id);
+  async deleteUsersByStatus(): Promise<User[]> {
+    return this.userService.deleteUser();
   }
   @Patch(':id')
   @ApiOperation({ summary: 'Update' })
