@@ -53,3 +53,16 @@ export class PaginationMetaDto implements PaginationMeta {
   @ApiProperty({ nullable: true })
   next: number | null;
 }
+
+export class JwtDecodeDto {
+  @ApiProperty()
+  iat: number;
+
+  @ApiProperty()
+  exp: number;
+}
+
+export class Token {
+  @ApiProperty()
+  token: string;
+}

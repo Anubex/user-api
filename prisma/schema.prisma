@@ -9,16 +9,25 @@ generator client {
 }
 
 model User {
-    id        Int      @id @default(autoincrement())
-    firstName String
-    lastName  String
-    status    STATUS   @default(enable)
-    createdAt DateTime @default(dbgenerated("NOW()")) @db.DateTime
-    updatedAt DateTime @default(dbgenerated("NOW() ON UPDATE NOW()")) @db.DateTime
+    id              Int      @id @default(autoincrement())
+    firstName       String
+    lastName        String
+    status          STATUS   @default(enable)
+    username        String?  @unique()
+    password        String?
+    role            ROLE     @default(admin)
+    defaultPassword Boolean  @default(true)
+    createdAt       DateTime @default(dbgenerated("NOW()")) @db.DateTime
+    updatedAt       DateTime @default(dbgenerated("NOW() ON UPDATE NOW()")) @db.DateTime
 }
 
 enum STATUS {
     enable
     disable
     remove
+}
+
+enum ROLE {
+    super_admin
+    admin
 }

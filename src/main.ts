@@ -9,10 +9,16 @@ async function bootstrap() {
     .setTitle('API Documentation')
     .setDescription('The API description')
     .setVersion('1.0')
+    .addTag('auth')
     .addTag('users')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api', app, document, {
+    swaggerOptions: {
+      tagsSorter: 'alpha',
+      operationsSorter: 'alpha',
+    },
+  });
 
   await app.listen(3333);
 }

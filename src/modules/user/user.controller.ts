@@ -30,6 +30,7 @@ import { InternalServerErrorResponse } from 'src/common/constants/app.dto';
 import responseHelper from 'src/common/helper/response.helper';
 import userDecorator from './user.decorator';
 import { User } from '@prisma/client';
+import { AuthGuards } from 'src/common/decorater/auth-guard.decorator';
 
 @ApiTags('users')
 @Controller('users')
@@ -38,6 +39,7 @@ export class UserController {
 
   @Version('1')
   @Post()
+  @AuthGuards()
   @ApiCreatedResponse({ type: CreateUserDto })
   async createUser(
     @Body() CreateUser: CreateUser,
@@ -48,6 +50,7 @@ export class UserController {
 
   @Version('1')
   @Get()
+  @AuthGuards()
   @userDecorator.getUserDecorator()
   @ApiOkResponse({ type: GetUserResponse })
   async findUsersByName(
@@ -64,11 +67,13 @@ export class UserController {
   //   return this.userService.deleteUser(id);
   // }
   @Delete('remove')
+  @AuthGuards()
   @ApiOperation({ summary: 'Delete user' })
   async deleteUsersByStatus(): Promise<User[]> {
     return this.userService.deleteUser();
   }
   @Patch(':id')
+  @AuthGuards()
   @ApiOperation({ summary: 'Update' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UpdateUserDto })
@@ -80,6 +85,7 @@ export class UserController {
   }
 
   @Get(':id')
+  @AuthGuards()
   @ApiOperation({ summary: 'Find a user by ID' })
   @ApiParam({ name: 'id', type: Number })
   async findUserById(@Param('id', ParseIntPipe) id: number): Promise<User> {
