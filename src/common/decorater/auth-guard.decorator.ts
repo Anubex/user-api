@@ -5,7 +5,7 @@ import { RoleGuard } from 'src/modules/auth/guard/role.guard';
 
 export function AuthGuards() {
   return applyDecorators(
-    UseGuards(AuthGuard(['user']), RoleGuard),
+    UseGuards(AuthGuard(['admins']), RoleGuard),
     ApiBearerAuth(),
   );
 }

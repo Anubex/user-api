@@ -1,5 +1,3 @@
-import { UserDto } from '../user/dto/user.dto';
-import { UserService } from '../user/user.service';
 import { JwtValidatePayload, SignInDto, SignInResponse } from './dto/auth.dto';
 
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
@@ -7,35 +5,35 @@ import { JwtService } from '@nestjs/jwt';
 import { STATUS } from '@prisma/client';
 import { compare } from 'bcrypt';
 import * as dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-
 import {
   ExceptionResult,
   JwtDecodeDto,
   Token,
 } from 'src/common/constants/app.dto';
-
+import { AdminsService } from '../admin/admin.service';
+import { AdminsDto } from '../admin/dto/admin.dto';
+import utc from 'dayjs/plugin/utc';
 @Injectable()
 export class AuthService {
   constructor(
     private jwtService: JwtService,
-    private userService: UserService,
+    private adminsService: AdminsService,
   ) {}
 
-  async validateUser(
+  async validateAdmins(
     payload: JwtValidatePayload,
-  ): Promise<UserDto | ExceptionResult> {
+  ): Promise<AdminsDto | ExceptionResult> {
     const { username } = payload;
-    const userInDB = await this.userService.get(
+    const adminsInDB = await this.adminsService.get(
       {
         where: { username },
       },
       'one',
     );
-    if (!userInDB) {
-      throw new InternalServerErrorException('Cannot get user');
+    if (!adminsInDB) {
+      throw new InternalServerErrorException('Cannot get admins');
     }
-    return userInDB as UserDto;
+    return adminsInDB as AdminsDto;
   }
 
   async verifyPassword(
@@ -62,28 +60,28 @@ export class AuthService {
   ): Promise<SignInResponse | ExceptionResult> {
     try {
       const { username, password } = signInDto;
-      const userInDB = await this.userService.get(
+      const adminsInDB = await this.adminsService.get(
         {
           where: { username },
         },
         'one',
       );
-      if (!userInDB) {
+      if (!adminsInDB) {
         return {
           code: 501,
-          message: 'Not found user',
+          message: 'Not found admins',
           status: 500,
         };
       }
-      const user = userInDB as UserDto;
-      if (user?.status !== STATUS.enable) {
+      const admins = adminsInDB as AdminsDto;
+      if (admins?.status !== STATUS.enable) {
         return {
           code: 403,
           message: 'Forbidden',
           status: 403,
         };
       }
-      const validate = await this.verifyPassword(password, user.password);
+      const validate = await this.verifyPassword(password, admins.password);
       if (!validate) {
         return {
           code: 503,

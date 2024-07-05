@@ -7,18 +7,22 @@ import { UserController } from './modules/user/user.controller';
 import { UserService } from './modules/user/user.service';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { AdminsModule } from './modules/admin/admin.module';
+import { AdminsService } from './modules/admin/admin.service';
+import { AdminsController } from './modules/admin/admin.controller';
 
 @Module({
   imports: [
-    AuthModule,
     ConfigModule.forRoot(),
     MongooseModule.forRoot(process.env.MONGODB_URI, {
       authSource: 'admin',
     }),
+    AuthModule,
+    AdminsModule,
     UserModule,
     PrismaModule,
   ],
-  controllers: [AuthController, UserController],
-  providers: [UserService],
+  controllers: [AdminsController, AuthController, UserController],
+  providers: [AdminsService, UserService],
 })
 export class AppModule {}
