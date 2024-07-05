@@ -54,7 +54,7 @@ export class AdminsController {
 
   @Version('1')
   @Post()
-  //   @AuthGuards()
+  @AuthGuards()
   @ApiCreatedResponse({ type: AdminsDto })
   async createAdmins(
     @Body() createAdminsDto: CreateAdminsDto,
