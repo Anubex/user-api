@@ -24,7 +24,10 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document, {
     swaggerOptions: {
-      tagsSorter: 'alpha',
+      tagsSorter: (a, b, c) => {
+        const order = ['auth', 'Admin Controller', 'users'];
+        return order.indexOf(a) - order.indexOf(b) - order.indexOf(c);
+      },
       operationsSorter: 'alpha',
     },
   });
