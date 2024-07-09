@@ -6,30 +6,21 @@ import {
   Version,
   Delete,
   Param,
-  ParseIntPipe,
   Query,
   Patch,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiCreatedResponse,
-  ApiParam,
-  ApiBody,
-  ApiOkResponse,
-} from '@nestjs/swagger';
+import { ApiTags, ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
 import {
   CreateUser,
-  CreateUserDto,
   GetUserDto,
   GetUserResponse,
   UpdateUserDto,
+  UserDto,
 } from './dto/user.dto';
 import { InternalServerErrorResponse } from 'src/common/constants/app.dto';
 import responseHelper from 'src/common/helper/response.helper';
 import userDecorator from './user.decorator';
-import { User } from '@prisma/client';
 import { AuthGuards } from 'src/common/decorater/auth-guard.decorator';
 
 @ApiTags('users')
@@ -40,10 +31,10 @@ export class UserController {
   @Version('1')
   @Post()
   @AuthGuards()
-  @ApiCreatedResponse({ type: CreateUserDto })
-  async createUser(
+  @ApiCreatedResponse({ type: CreateUser })
+  async create(
     @Body() CreateUser: CreateUser,
-  ): Promise<CreateUserDto | InternalServerErrorResponse> {
+  ): Promise<CreateUser | InternalServerErrorResponse> {
     const result = await this.userService.createUser(CreateUser);
     return responseHelper.parseHttpStatusCode(result);
   }
@@ -59,36 +50,33 @@ export class UserController {
     const result = await this.userService.findUsersByName(getUserDto);
     return responseHelper.parseHttpStatusCode(result);
   }
-
-  // @Delete(':id')
-  // @ApiOperation({ summary: 'Delete user' })
-  // @ApiParam({ name: 'id', type: Number })
-  // deleteUser(@Param('id', ParseIntPipe) id: number) {
-  //   return this.userService.deleteUser(id);
-  // }
-  @Delete('remove')
+  @Delete(':id')
   @AuthGuards()
-  @ApiOperation({ summary: 'Delete user' })
-  async deleteUsersByStatus(): Promise<User[]> {
-    return this.userService.deleteUser();
+  @ApiOkResponse({ type: UserDto })
+  async deleteUser(
+    @Param('id') userid: number,
+  ): Promise<UserDto | InternalServerErrorResponse> {
+    const result = await this.userService.deleteUser(userid);
+    return responseHelper.parseHttpStatusCode(result);
   }
   @Patch(':id')
   @AuthGuards()
-  @ApiOperation({ summary: 'Update' })
-  @ApiParam({ name: 'id', type: Number })
-  @ApiBody({ type: UpdateUserDto })
+  @ApiOkResponse({ type: UserDto })
   async updateUser(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') userid: number,
     @Body() updateUserDto: UpdateUserDto,
-  ): Promise<User> {
-    return this.userService.updateUser(id, updateUserDto);
+  ): Promise<UserDto | InternalServerErrorResponse> {
+    const result = await this.userService.updateUser(userid, updateUserDto);
+    return responseHelper.parseHttpStatusCode(result);
   }
 
   @Get(':id')
   @AuthGuards()
-  @ApiOperation({ summary: 'Find a user by ID' })
-  @ApiParam({ name: 'id', type: Number })
-  async findUserById(@Param('id', ParseIntPipe) id: number): Promise<User> {
-    return this.userService.findUserById(id);
+  @ApiOkResponse({ type: UserDto })
+  async getUserById(
+    @Param('id') userId: number,
+  ): Promise<UserDto | InternalServerErrorResponse> {
+    const result = await this.userService.findById(userId);
+    return responseHelper.parseHttpStatusCode(result);
   }
 }

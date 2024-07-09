@@ -22,15 +22,7 @@ async function bootstrap() {
     .addTag('users')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document, {
-    swaggerOptions: {
-      tagsSorter: (a, b, c) => {
-        const order = ['auth', 'Admin Controller', 'users'];
-        return order.indexOf(a) - order.indexOf(b) - order.indexOf(c);
-      },
-      operationsSorter: 'alpha',
-    },
-  });
+  SwaggerModule.setup('api', app, document);
 
   await app.listen(3333);
 }

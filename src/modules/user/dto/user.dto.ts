@@ -5,15 +5,7 @@ import { PaginatedResult } from 'prisma-pagination';
 import { PaginationMetaDto } from 'src/common/constants/app.dto';
 
 export class UserDto extends UserEntity {}
-export class CreateUserDto {
-  @ApiProperty({ example: 'First name', description: 'First name of the user' })
-  firstName: string;
-
-  @ApiProperty({ example: 'Last name', description: 'Last name of the user' })
-  lastName: string;
-}
-
-export class CreateUser extends PickType(CreateUserDto, [
+export class CreateUser extends PickType(UserEntity, [
   'firstName',
   'lastName',
 ]) {
@@ -29,10 +21,12 @@ export class CreateUser extends PickType(CreateUserDto, [
 }
 
 export class UpdateUserDto {
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
   firstName?: string;
 
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
   lastName?: string;

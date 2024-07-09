@@ -1,13 +1,13 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateUser,
-  CreateUserDto,
   GetUserDto,
   GetUserResponse,
+  UpdateUserDto,
   UserDto,
 } from './dto/user.dto';
-import { Prisma, STATUS, User } from '@prisma/client';
+import { Prisma, STATUS } from '@prisma/client';
 import { ExceptionResult } from 'src/common/constants/app.dto';
 import { createPaginator } from 'prisma-pagination';
 
@@ -26,7 +26,7 @@ export class UserService {
       distinct?: Prisma.Enumerable<Prisma.UserScalarFieldEnum>;
     } = {},
     fetch: 'one' | 'many',
-  ): Promise<CreateUserDto | CreateUserDto[] | ExceptionResult> {
+  ): Promise<CreateUser | CreateUser[] | ExceptionResult> {
     try {
       const result =
         (await fetch) === 'one'
@@ -52,7 +52,7 @@ export class UserService {
         | undefined;
     } = { data: undefined },
     prisma?: Prisma.TransactionClient,
-  ): Promise<CreateUserDto | ExceptionResult> {
+  ): Promise<CreateUser | ExceptionResult> {
     try {
       const result = await (prisma ?? this.prisma).user.create(options);
       return result;
@@ -65,22 +65,45 @@ export class UserService {
       };
     }
   }
+  async update(
+    options: {
+      select?: Prisma.UserSelect;
+      data: Prisma.UserUncheckedUpdateInput | Prisma.UserUpdateInput;
+      where: Prisma.UserWhereUniqueInput;
+    } = {
+      data: {},
+      where: {},
+    },
+    prisma?: Prisma.TransactionClient,
+  ): Promise<UserDto | ExceptionResult> {
+    try {
+      const result = await (prisma ?? this.prisma).user.update(options);
+      return result;
+    } catch (error) {
+      console.log('[user.service.update]', error.stack);
+      return {
+        code: 500,
+        message: error.stack,
+        status: 500,
+      };
+    }
+  }
   async createUser({
     firstName,
     lastName,
-  }: CreateUser): Promise<CreateUserDto | ExceptionResult> {
+  }: CreateUser): Promise<CreateUser | ExceptionResult> {
     try {
-      //   const userInDB = await this.get(
-      //     {
-      //       where: {
-      //         firstName,
-      //       },
+      // const userInDB = await this.get(
+      //   {
+      //     where: {
+      //       firstName,
       //     },
-      //     'one',
-      //   );
-      //   if (userInDB) {
-      //     throw new Error('Already have username');
-      //   }
+      //   },
+      //   'one',
+      // );
+      // if (userInDB) {
+      //   throw new Error('Already have username');
+      // }
       const created = await this.create({
         data: {
           firstName,
@@ -147,48 +170,68 @@ export class UserService {
       console.log('[user.service.getUser]', error.stack);
     }
   }
-  async deleteUser(): Promise<User[]> {
+  async deleteUser(id: number): Promise<UserDto | ExceptionResult> {
     try {
-      const deletedUsers = await this.prisma.user.deleteMany({
-        where: {
-          status: STATUS.remove,
-        },
+      const result = await this.prisma.user.delete({
+        where: { id: Number(id) },
       });
-      return deletedUsers as any;
+      return result;
     } catch (error) {
-      throw new Error(`Could not delete user  : ${error.message}`);
+      console.log('[user.service.deleteUser]', error.stack);
+      return {
+        code: 500,
+        message: error.stack,
+        status: 500,
+      };
     }
   }
+
   async updateUser(
     id: number,
-    data: { firstName?: string; lastName?: string },
-  ): Promise<User> {
-    const user = await this.prisma.user.findUnique({ where: { id } });
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
+    updateUserDto: UpdateUserDto,
+  ): Promise<UserDto | ExceptionResult> {
+    try {
+      const { ...restUpdateUserDto } = updateUserDto;
+      const result = await this.update({
+        data: {
+          ...restUpdateUserDto,
+        },
+        where: {
+          id: id,
+        },
+      });
+      return result;
+    } catch (error) {
+      console.log('[user.service.updateUser]', error.stack);
+      return {
+        code: 500,
+        message: error.stack,
+        status: 500,
+      };
     }
-
-    return this.prisma.user.update({
-      where: { id },
-      data: {
-        ...data,
-      },
-    });
   }
-  // async findUserById(id: number): Promise<User> {
-  //   const user = await this.prisma.user.findUnique({ where: { id } });
-  //   if (!user) {
-  //     throw new NotFoundException(`User with ID ${id} not found`);
-  //   }
-  //   return user;
-  // }
-  async findUserById(id: number): Promise<User> {
-    const user = await this.prisma.user.findUnique({
-      where: { id },
-    });
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
+
+  async findById(id: number): Promise<UserDto | ExceptionResult> {
+    try {
+      const result = await this.prisma.user.findUnique({
+        where: { id: Number(id) },
+      });
+
+      if (!result) {
+        return {
+          code: 404,
+          message: `User with id ${id} not found.`,
+          status: 404,
+        };
+      }
+      return result;
+    } catch (error) {
+      console.log('[user.service.findById]', error.stack);
+      return {
+        code: 500,
+        message: error.stack,
+        status: 500,
+      };
     }
-    return user;
   }
 }

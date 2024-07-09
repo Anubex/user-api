@@ -12,7 +12,6 @@ import {
 } from 'src/common/constants/app.dto';
 import { AdminsService } from '../admin/admin.service';
 import { AdminsDto } from '../admin/dto/admin.dto';
-import utc from 'dayjs/plugin/utc';
 @Injectable()
 export class AuthService {
   constructor(
