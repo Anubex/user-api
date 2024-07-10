@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateUser,
+  DeleteUserDto,
   GetUserDto,
   GetUserResponse,
   UpdateUserDto,
@@ -214,7 +215,7 @@ export class UserService {
   async findById(id: number): Promise<UserDto | ExceptionResult> {
     try {
       const result = await this.prisma.user.findUnique({
-        where: { id: Number(id) },
+        where: { id },
       });
 
       if (!result) {
@@ -227,6 +228,26 @@ export class UserService {
       return result;
     } catch (error) {
       console.log('[user.service.findById]', error.stack);
+      return {
+        code: 500,
+        message: error.stack,
+        status: 500,
+      };
+    }
+  }
+
+  async deleteUsersByStatus(): Promise<
+    ExceptionResult | { deletedCount: number }
+  > {
+    try {
+      const result = await this.prisma.user.deleteMany({
+        where: {
+          status: STATUS.remove,
+        },
+      });
+      return { deletedCount: result.count };
+    } catch (error) {
+      console.log('[user.service.deleteUsersByStatus]', error.stack);
       return {
         code: 500,
         message: error.stack,

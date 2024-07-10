@@ -13,6 +13,7 @@ import { UserService } from './user.service';
 import { ApiTags, ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
 import {
   CreateUser,
+  DeleteUserDto,
   GetUserDto,
   GetUserResponse,
   UpdateUserDto,
@@ -57,6 +58,15 @@ export class UserController {
     @Param('id') userid: number,
   ): Promise<UserDto | InternalServerErrorResponse> {
     const result = await this.userService.deleteUser(userid);
+    return responseHelper.parseHttpStatusCode(result);
+  }
+  @Delete('/status/remove')
+  @AuthGuards()
+  @ApiOkResponse({ type: DeleteUserDto })
+  async deleteUsersByStatus(): Promise<
+    { deletedCount: number } | InternalServerErrorResponse
+  > {
+    const result = await this.userService.deleteUsersByStatus();
     return responseHelper.parseHttpStatusCode(result);
   }
   @Patch(':id')

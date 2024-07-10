@@ -3,6 +3,7 @@ import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { UserEntity } from '../entities/user.entities';
 import { PaginatedResult } from 'prisma-pagination';
 import { PaginationMetaDto } from 'src/common/constants/app.dto';
+import { STATUS } from '@prisma/client';
 
 export class UserDto extends UserEntity {}
 export class CreateUser extends PickType(UserEntity, [
@@ -31,7 +32,12 @@ export class UpdateUserDto {
   @IsString()
   lastName?: string;
 }
-
+// test
+// export class findById {
+//   @ApiProperty()
+//   @IsOptional()
+//   id: number;
+// }
 export class GetUserDto {
   @ApiProperty({ required: false })
   @IsString()
@@ -62,4 +68,9 @@ export class GetUserResponse implements PaginatedResult<UserDto> {
     prev: number;
     next: number;
   };
+}
+
+export class DeleteUserDto {
+  @ApiProperty()
+  status: STATUS;
 }
