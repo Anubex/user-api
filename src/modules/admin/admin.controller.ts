@@ -29,16 +29,16 @@ import adminsDecorator from './admin.decorator';
 export class AdminsController {
   constructor(private readonly adminsService: AdminsService) {}
 
-  @Version('1')
-  @Get('info')
-  @AuthGuards()
-  @ApiOkResponse({ type: GetAdminsInfoResponse })
-  async getAdminsInfo(
-    @Admins() adminsDto: AdminsDto,
-  ): Promise<GetAdminsInfoResponse | InternalServerErrorResponse> {
-    const result = await this.adminsService.getAdminsInfo(adminsDto);
-    return responseHelper.parseHttpStatusCode(result);
-  }
+  // @Version('1')
+  // @Get('info')
+  // @AuthGuards()
+  // @ApiOkResponse({ type: GetAdminsInfoResponse })
+  // async getAdminsInfo(
+  //   @Admins() adminsDto: AdminsDto,
+  // ): Promise<GetAdminsInfoResponse | InternalServerErrorResponse> {
+  //   const result = await this.adminsService.getAdminsInfo(adminsDto);
+  //   return responseHelper.parseHttpStatusCode(result);
+  // }
 
   @Version('1')
   @Get()

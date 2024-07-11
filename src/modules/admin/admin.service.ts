@@ -93,20 +93,20 @@ export class AdminsService {
     }
   }
 
-  async getAdminsInfo(
-    adminsDto: AdminsDto,
-  ): Promise<GetAdminsInfoResponse | ExceptionResult> {
-    try {
-      return omit(adminsDto, ['password']);
-    } catch (error) {
-      console.log('[admins.service.getAdminsInfo]', error.stack);
-      return {
-        code: 500,
-        message: error.stack,
-        status: 500,
-      };
-    }
-  }
+  // async getAdminsInfo(
+  //   adminsDto: AdminsDto,
+  // ): Promise<GetAdminsInfoResponse | ExceptionResult> {
+  //   try {
+  //     return omit(adminsDto, ['password']);
+  //   } catch (error) {
+  //     console.log('[admins.service.getAdminsInfo]', error.stack);
+  //     return {
+  //       code: 500,
+  //       message: error.stack,
+  //       status: 500,
+  //     };
+  //   }
+  // }
 
   async getAdmins({
     filter,

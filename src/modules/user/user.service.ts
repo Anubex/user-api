@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateUser,
-  DeleteUserDto,
   GetUserDto,
   GetUserResponse,
   UpdateUserDto,
@@ -186,7 +185,6 @@ export class UserService {
       };
     }
   }
-
   async updateUser(
     id: number,
     updateUserDto: UpdateUserDto,
