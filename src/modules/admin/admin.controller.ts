@@ -15,7 +15,7 @@ import {
   AdminsDto,
   CreateAdminsDto,
   GetAdminsDto,
-  GetAdminsInfoResponse,
+  // GetAdminsInfoResponse,
   GetAdminsResponse,
   UpdateAdminsDto,
 } from './dto/admin.dto';

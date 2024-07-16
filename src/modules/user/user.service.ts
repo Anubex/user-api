@@ -93,17 +93,17 @@ export class UserService {
     lastName,
   }: CreateUser): Promise<CreateUser | ExceptionResult> {
     try {
-      // const userInDB = await this.get(
-      //   {
-      //     where: {
-      //       firstName,
-      //     },
-      //   },
-      //   'one',
-      // );
-      // if (userInDB) {
-      //   throw new Error('Already have username');
-      // }
+      const userInDB = await this.get(
+        {
+          where: {
+            firstName,
+          },
+        },
+        'one',
+      );
+      if (userInDB) {
+        throw new Error('Already have username');
+      }
       const created = await this.create({
         data: {
           firstName,
